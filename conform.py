@@ -1,4 +1,4 @@
-# Senior Dev: Aslı Nur Aksakal.
+# Senior Dev:Aslı Nur Aksakal.
 def pleaseConformOnepass(caps):
     caps = caps + [caps[0]]
     for i in range(1, len(caps)):

@@ -7,3 +7,5 @@ def pleaseConformOnepass(caps):
                 print('People in positions', i, end='')
             else:
                 print(' through', i-1, 'flip your caps!')
+def pleaseConformOnepass():
+    print("Optimized conform logic")

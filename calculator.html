@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1e1e1e;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .calculator {
+            background-color: #0078D7;
+            padding: 15px;
+            width: 280px;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+        }
+
+        .display {
+            background-color: #FFFFFF;
+            color: #000000;
+            padding: 10px;
+            font-size: 40px;
+            margin-bottom: 15px;
+            height: 60px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+            box-sizing: border-box;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .btn {
+            background-color: #929292;
+            color: #FFFFFF;
+            border: none;
+            padding: 20px 0;
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+
+        .btn:hover {
+            background-color: #A5A5A5;
+        }
+
+        .btn:active {
+            background-color: #7A7A7A;
+        }
+
+        .btn-equal {
+            background-color: #005A9E; 
+        }
+
+        .btn-equal:hover {
+            background-color: #006AB8;
+        }
+
+        .btn-equal:active {
+            background-color: #004578;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="btn" onclick="appendNumber('7')">7</button>
+            <button class="btn" onclick="appendNumber('8')">8</button>
+            <button class="btn" onclick="appendNumber('9')">9</button>
+            <button class="btn" onclick="setOperator('/')">&divide;</button>
+
+            <button class="btn" onclick="appendNumber('4')">4</button>
+            <button class="btn" onclick="appendNumber('5')">5</button>
+            <button class="btn" onclick="appendNumber('6')">6</button>
+            <button class="btn" onclick="setOperator('*')">&times;</button>
+
+            <button class="btn" onclick="appendNumber('1')">1</button>
+            <button class="btn" onclick="appendNumber('2')">2</button>
+            <button class="btn" onclick="appendNumber('3')">3</button>
+            <button class="btn" onclick="setOperator('-')">&minus;</button>
+
+            <button class="btn" onclick="appendNumber('0')">0</button>
+            <button class="btn" onclick="appendDot()">.</button>
+            <button class="btn btn-equal" onclick="calculate()">=</button>
+            <button class="btn" onclick="setOperator('+')">+</button>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = '0';
+        let previousInput = '';
+        let operator = null;
+        let shouldResetScreen = false;
+
+        const display = document.getElementById('display');
+
+        function updateDisplay() {
+            display.innerText = currentInput;
+        }
+
+        function appendNumber(number) {
+            if (currentInput === '0' || shouldResetScreen) {
+                currentInput = number;
+                shouldResetScreen = false;
+            } else {
+                currentInput += number;
+            }
+            updateDisplay();
+        }
+
+        function appendDot() {
+            if (shouldResetScreen) {
+                currentInput = '0.';
+                shouldResetScreen = false;
+                updateDisplay();
+                return;
+            }
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+                updateDisplay();
+            }
+        }
+
+        function setOperator(op) {
+            if (operator !== null && !shouldResetScreen) {
+                calculate();
+            }
+            previousInput = currentInput;
+            operator = op;
+            shouldResetScreen = true;
+        }
+
+        function calculate() {
+            if (operator === null || shouldResetScreen) return;
+            let a = parseFloat(previousInput);
+            let b = parseFloat(currentInput);
+            let res = 0;
+            switch(operator) {
+                case '+': res = a + b; break;
+                case '-': res = a - b; break;
+                case '*': res = a * b; break;
+                case '/': 
+                    if (b === 0) {
+                        res = 'Error'; 
+                    } else {
+                        res = a / b; 
+                    }
+                    break;
+            }
+            
+            // Handle floating point precision errors
+            if (typeof res === 'number') {
+                res = Math.round(res * 100000000) / 100000000;
+            }
+            
+            currentInput = String(res);
+            operator = null;
+            shouldResetScreen = true;
+            updateDisplay();
+        }
+
+        // Add keyboard support for better "vibe"
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') {
+                appendNumber(e.key);
+            } else if (e.key === '.') {
+                appendDot();
+            } else if (e.key === '=' || e.key === 'Enter') {
+                e.preventDefault(); // prevent form submission or jumping
+                calculate();
+            } else if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
+                setOperator(e.key);
+            } else if (e.key === 'Backspace') {
+                if (currentInput !== 'Error' && !shouldResetScreen) {
+                    currentInput = currentInput.slice(0, -1);
+                    if (currentInput === '') {
+                        currentInput = '0';
+                    }
+                    updateDisplay();
+                }
+            } else if (e.key === 'Escape') {
+                currentInput = '0';
+                previousInput = '';
+                operator = null;
+                shouldResetScreen = false;
+                updateDisplay();
+            }
+        });
+    </script>
+</body>
+</html>
